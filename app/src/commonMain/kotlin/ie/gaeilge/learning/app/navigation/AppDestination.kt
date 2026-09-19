@@ -2,6 +2,9 @@ package ie.gaeilge.learning.app.navigation
 
 enum class AppDestination {
     Home,
-    Lessons,
-    Quiz,
+    Learn,
+    Reader,
+    Practice,
+    Saved,
+    Progress
 }

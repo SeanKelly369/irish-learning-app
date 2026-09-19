@@ -1,79 +1,78 @@
 package ie.gaeilge.learning.feature.home
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ie.gaeilge.learning.core.data.InMemoryLessonRepository
-import ie.gaeilge.learning.core.designsystem.AppStrings
-import ie.gaeilge.learning.core.domain.Lesson
+import ie.gaeilge.learning.core.domain.*
 
 @Composable
 fun HomeScreen(
-    onStartGame: () -> Unit = {},
-    repository: InMemoryLessonRepository = remember { InMemoryLessonRepository() },
+    progressRepository: ProgressRepository,
+    topicLessonRepository: TopicLessonRepository,
+    vocabularyRepository: VocabularyRepository,
+    onNavigateToLearn: () -> Unit
 ) {
-    val lessons = remember(repository) { repository.getLessons() }
-    val completed = lessons.count(Lesson::completed)
-    Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp),
+    var progress by remember { mutableStateOf(UserProgress()) }
+    var activeDialect by remember { mutableStateOf(Dialect.STANDARD) }
+    var dueReviewsCount by remember { mutableStateOf(0) }
+
+    LaunchedEffect(progressRepository) {
+        progressRepository.observeProgress().collect { progress = it }
+    }
+    LaunchedEffect(progressRepository) {
+        progressRepository.observeDialectPreference().collect { activeDialect = it }
+    }
+    LaunchedEffect(progressRepository) {
+        progressRepository.observeReviewQueue().collect { dueReviewsCount = it.size }
+    }
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(AppStrings.welcome, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-        Text(AppStrings.appName, style = MaterialTheme.typography.displaySmall)
-        Text(AppStrings.appTagline, style = MaterialTheme.typography.bodyLarge)
-        ProgressCard(completed = completed, total = lessons.size)
-        lessons.firstOrNull { !it.completed }?.let { lesson ->
-            LessonCard(lesson, onStartGame)
+        item {
+            Column {
+                Text("Dia Duit! Welcome back", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                Text("Gaeilge Learning", style = MaterialTheme.typography.displaySmall)
+                Text("Active Dialect Tracking: ${activeDialect.name}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.secondary)
+            }
         }
-        Spacer(Modifier.height(4.dp))
-        OutlinedButton(onClick = {}, modifier = Modifier.fillMaxWidth()) {
-            Text(AppStrings.viewLessons)
-        }
-    }
-}
 
-@Composable
-private fun ProgressCard(completed: Int, total: Int) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(AppStrings.todaysProgress, style = MaterialTheme.typography.titleMedium)
-            Text("$completed/$total ${AppStrings.lessonsComplete}", style = MaterialTheme.typography.bodyMedium)
-            LinearProgressIndicator(
-                progress = { if (total == 0) 0f else completed.toFloat() / total },
+        item {
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Today's Workload Overview", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                    Text("• $dueReviewsCount items scheduled in your Spaced-Repetition queue.", style = MaterialTheme.typography.bodyMedium)
+                    Text("• ${progress.lessonsCompletedCount} complete modules logged.", style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+        }
+
+        item {
+            Card(
                 modifier = Modifier.fillMaxWidth(),
-            )
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+            ) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text("Irish of the Day Phrase", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                    Text("Ní neart go cur le chéile.", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.primary)
+                    Text("Literal: No strength until putting together.", style = MaterialTheme.typography.labelSmall)
+                    Text("Natural translation: There is strength in unity.", style = MaterialTheme.typography.bodyLarge)
+                }
+            }
         }
-    }
-}
 
-@Composable
-private fun LessonCard(lesson: Lesson, onStartGame: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(AppStrings.continueLearning, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-            Text(lesson.irishTitle, style = MaterialTheme.typography.headlineSmall)
-            Text(lesson.title, style = MaterialTheme.typography.titleMedium)
-            Text(lesson.description, style = MaterialTheme.typography.bodyMedium)
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("${lesson.durationMinutes} ${AppStrings.minutes}", style = MaterialTheme.typography.labelMedium)
-                Button(onClick = onStartGame) {
-                    Text(AppStrings.playGame)
+        item {
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Continue Learning Tracks", style = MaterialTheme.typography.titleMedium)
+                    Text("Pick up right where you left off or choose fresh real everyday contexts.", style = MaterialTheme.typography.bodyMedium)
+                    Button(onClick = onNavigateToLearn, modifier = Modifier.fillMaxWidth()) {
+                        Text("Open Learning Board")
+                    }
                 }
             }
         }
