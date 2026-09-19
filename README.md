@@ -21,7 +21,7 @@ app/src/
   iosMain/     iOS Compose view-controller entry point
 ```
 
-Packages are organized for feature growth: `app`, `core/designsystem`, `core/data`, `core/domain`, and `feature/home`. Future lesson and quiz screens belong in `feature/lessons` and `feature/quiz`.
+Packages are organized for feature growth: `app`, `core/designsystem`, `core/data`, `core/domain`, and `feature/home`. The first playable quiz is in `feature/quiz`: a data-driven picture game where learners tap the matching illustration for an Irish word, earn points, build a streak, and replay a short round. Future lesson screens belong in `feature/lessons`.
 
 ## Run
 

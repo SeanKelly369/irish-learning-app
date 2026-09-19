@@ -21,4 +21,11 @@ class InMemoryLessonRepositoryTest {
 
         assertEquals(listOf("home"), custom.getLessons().map { it.id })
     }
+
+    @Test
+    fun pictureChallengesAlwaysIncludeTheirCorrectPicture() {
+        InMemoryPictureGameRepository().getChallenges().forEach { challenge ->
+            assertTrue(challenge.picture in challenge.options)
+        }
+    }
 }

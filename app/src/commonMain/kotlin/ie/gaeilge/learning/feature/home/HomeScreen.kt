@@ -25,6 +25,7 @@ import ie.gaeilge.learning.core.domain.Lesson
 
 @Composable
 fun HomeScreen(
+    onStartGame: () -> Unit = {},
     repository: InMemoryLessonRepository = remember { InMemoryLessonRepository() },
 ) {
     val lessons = remember(repository) { repository.getLessons() }
@@ -38,7 +39,7 @@ fun HomeScreen(
         Text(AppStrings.appTagline, style = MaterialTheme.typography.bodyLarge)
         ProgressCard(completed = completed, total = lessons.size)
         lessons.firstOrNull { !it.completed }?.let { lesson ->
-            LessonCard(lesson)
+            LessonCard(lesson, onStartGame)
         }
         Spacer(Modifier.height(4.dp))
         OutlinedButton(onClick = {}, modifier = Modifier.fillMaxWidth()) {
@@ -62,7 +63,7 @@ private fun ProgressCard(completed: Int, total: Int) {
 }
 
 @Composable
-private fun LessonCard(lesson: Lesson) {
+private fun LessonCard(lesson: Lesson, onStartGame: () -> Unit) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(AppStrings.continueLearning, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
@@ -71,8 +72,8 @@ private fun LessonCard(lesson: Lesson) {
             Text(lesson.description, style = MaterialTheme.typography.bodyMedium)
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("${lesson.durationMinutes} ${AppStrings.minutes}", style = MaterialTheme.typography.labelMedium)
-                Button(onClick = {}) {
-                    Text(AppStrings.startLesson)
+                Button(onClick = onStartGame) {
+                    Text(AppStrings.playGame)
                 }
             }
         }
