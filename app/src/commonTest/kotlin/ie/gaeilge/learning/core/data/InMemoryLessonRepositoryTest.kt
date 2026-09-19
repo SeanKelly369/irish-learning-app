@@ -28,4 +28,9 @@ class InMemoryLessonRepositoryTest {
             assertTrue(challenge.picture in challenge.options)
         }
     }
+
+    @Test
+    fun pictureGameIncludesAnAnimalRound() {
+        assertTrue(InMemoryPictureGameRepository().getChallenges().any { it.word == "Madra" })
+    }
 }

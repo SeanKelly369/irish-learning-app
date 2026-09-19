@@ -165,6 +165,8 @@ private fun PictureIllustration(picture: Picture) {
             Picture.TREE -> drawTree()
             Picture.CAT -> drawCat()
             Picture.BOOK -> drawBook()
+            Picture.DOG -> drawDog()
+            Picture.FISH -> drawFish()
         }
     }
 }
@@ -239,6 +241,34 @@ private fun DrawScope.drawBook() {
         cornerRadius = CornerRadius(8f),
     )
     drawLine(Color.White, center.copy(x = center.x, y = 18f), center.copy(x = center.x, y = size.height - 12f), 3f)
+}
+
+private fun DrawScope.drawDog() {
+    drawCircle(Color(0xFFB47A4D), 29f, center)
+    drawCircle(Color(0xFF8B5A3C), 12f, center.copy(x = center.x - 28, y = center.y - 20))
+    drawCircle(Color(0xFF8B5A3C), 12f, center.copy(x = center.x + 28, y = center.y - 20))
+    drawCircle(Color.White, 4f, center.copy(x = center.x - 10, y = center.y - 4))
+    drawCircle(Color.White, 4f, center.copy(x = center.x + 10, y = center.y - 4))
+    drawCircle(Color(0xFF3F3028), 5f, center.copy(y = center.y + 12))
+}
+
+private fun DrawScope.drawFish() {
+    drawOval(
+        Color(0xFF5A9CC8),
+        topLeft = Offset(18f, center.y - 22),
+        size = Size(52f, 44f),
+    )
+    drawPath(
+        Path().apply {
+            moveTo(18f, center.y)
+            lineTo(0f, center.y - 20)
+            lineTo(0f, center.y + 20)
+            close()
+        },
+        Color(0xFF3E7FAE),
+    )
+    drawCircle(Color.White, 6f, center.copy(x = center.x + 20, y = center.y - 8))
+    drawCircle(Color(0xFF2D3D4A), 3f, center.copy(x = center.x + 21, y = center.y - 8))
 }
 
 @Composable

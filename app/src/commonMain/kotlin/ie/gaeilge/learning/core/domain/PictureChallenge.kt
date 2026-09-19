@@ -14,4 +14,6 @@ enum class Picture {
     TREE,
     CAT,
     BOOK,
+    DOG,
+    FISH,
 }
